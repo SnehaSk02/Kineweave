@@ -16,6 +16,10 @@ def ask_llm(prompt: str):
     response = client.chat.completions.create(
         model=DEFAULT_MODEL,
         messages=[
+             {
+                "role": "system",
+                "content": "You are a strict JSON generation assistant. Always return valid JSON only."
+            },
             {
                 "role": "user",
                 "content": prompt

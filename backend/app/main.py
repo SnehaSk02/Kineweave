@@ -1,7 +1,9 @@
 from fastapi import FastAPI
-from backend.app.api.capture_routes import router as capture_router
+from app.api.capture_routes import router as capture_router
+from app.api.planner_routes import router as planner_router
 app = FastAPI()
 app.include_router(capture_router)
+app.include_router(planner_router)
 
 @app.get("/")
 def root():
