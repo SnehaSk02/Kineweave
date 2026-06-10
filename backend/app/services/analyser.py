@@ -9,7 +9,8 @@ def analyze_capture(text: str):
 You are KineWeave, an AI-powered productivity assistant.
 
 Analyze the user's input and return ONLY valid JSON.
-
+The user might enter multiple distinct thoughts in one sentence (e.g., "Buy milk and call mom").
+You must split these into separate items.
 JSON Schema:
 
 {{
@@ -68,20 +69,16 @@ Intent Definitions:
   "LangChain supports RAG pipelines"
 
 Priority Rules:
-
 - High:
   Contains deadlines, dates, times, urgent actions,
   interviews, exams, meetings, appointments,
   follow-ups, or important commitments.
-
 - Medium:
   Normal tasks, goals, and learning activities.
-
 - Low:
   General notes, ideas, and observations.
 
 Entity Extraction:
-
 Extract:
 - person
 - date
@@ -90,34 +87,49 @@ Extract:
 - topic
 
 Tag Generation Rules:
-
 - Generate 3-5 meaningful tags.
 - Use concise tags.
 - Never return empty tags if a topic can be inferred.
 - Tags should help future search and retrieval.
 
 Examples:
-
 Input:
-Call Rahul tomorrow at 5 PM regarding internship
+Call Rahul tomorrow at 5 PM regarding internship and also buy groceries on the way home
 
 Output:
 {{
-    "intent": "Reminder",
-    "priority": "High",
-    "entities": {{
-        "person": ["Rahul"],
-        "date": ["tomorrow"],
-        "time": ["5 PM"],
-        "organization": [],
-        "topic": ["internship"]
-    }},
-    "tags": ["Internship", "Communication", "Follow-up"]
+    "items": [
+        {{
+            "description": "Call Rahul regarding internship",
+            "intent": "Reminder",
+            "priority": "High",
+            "entities": {{
+                "person": ["Rahul"],
+                "date": ["tomorrow"],
+                "time": ["5 PM"],
+                "organization": [],
+                "topic": ["internship"]
+            }},
+            "tags": ["Internship", "Communication", "Follow-up"]
+        }},
+        {{
+            "description": "Buy groceries",
+            "intent": "Task",
+            "priority": "Low",
+            "entities": {{
+                "person": [],
+                "date": [],
+                "time": [],
+                "organization": [],
+                "topic": ["groceries"]
+            }},
+            "tags": ["Shopping", "Errands", "Home"]
+        }}
+    ]
 }}
 
 Input:
 Need to learn LangChain before placements
-
 Output:
 {{
     "intent": "Learning Goal",
@@ -131,9 +143,7 @@ Output:
     }},
     "tags": ["AI", "Learning", "Career", "LangChain"]
 }}
-
 Return ONLY valid JSON.
-
 Text:
 {text}
 """

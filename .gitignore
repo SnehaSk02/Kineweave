@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 .vscode/
 backend/test_intent.py
+frontend/voice_test.py

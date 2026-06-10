@@ -20,6 +20,12 @@ class Capture(Base):
 
     priority = Column(String(20), default="Medium")
 
+    deadline = Column(String(100), nullable=True)
+
+    source = Column(String(50), default="text")
+
+    progress = Column(Integer, default=0)
+
     entities = Column(JSON)
 
     tags=Column(JSON)
