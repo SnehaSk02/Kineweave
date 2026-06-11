@@ -5,11 +5,11 @@ import json
 from app.database.dependencies import get_db
 
 from app.models.capture import Capture
-from app.schemas.capture_schema import CaptureRequest
-from app.services.planner_engine import generate_action_plan
 from app.models.action_plan import ActionPlan
+from app.schemas.capture_schema import CaptureRequest
 from app.services.analyser import analyze_capture
-
+from app.services.planner_engine import generate_action_plan
+from app.services.vector_store import store_capture
 
 router = APIRouter()
 
@@ -20,53 +20,107 @@ def create_capture(
     db: Session = Depends(get_db)
 ):
 
-    analysis = analyze_capture(request.text)
-
-    new_capture = Capture(
-        original_text=request.text,
-        intent=analysis.get("intent", "Task"),
-        category=analysis.get("intent", "Task"),
-        status="Pending",
-        priority=request.priority
-        if request.priority
-        else analysis.get(
-            "priority",
-            "Medium"
-        ),
-        deadline=request.deadline,
-        source=request.source,
-        entities=json.dumps(
-        analysis.get("entities", {})
-    ),
-        tags=json.dumps(
-            analysis.get("tags", [])
-        )
+    analysis = analyze_capture(
+        request.text
     )
 
-    db.add(new_capture)
-    db.commit()
-    db.refresh(new_capture)
+    captures = analysis.get(
+        "captures",
+        []
+    )
 
-    steps = generate_action_plan(
-    new_capture.original_text
-)
+    saved_captures = []
 
-    for index, step in enumerate(steps, start=1):
+    for item in captures:
 
-        new_step = ActionPlan(
-            capture_id=new_capture.id,
-            step_number=index,
-            step_title=step["title"],
-            step_description=step["description"],
-            status="Pending"
+        new_capture = Capture(
+            original_text=item.get(
+                "text",
+                ""
+            ),
+            intent=item.get(
+                "intent",
+                "Task"
+            ),
+            category=item.get(
+                "intent",
+                "Task"
+            ),
+            status="Pending",
+            priority=item.get(
+                "priority",
+                "Medium"
+            ),
+            entities=json.dumps(
+                item.get(
+                    "entities",
+                    {}
+                )
+            ),
+            tags=json.dumps(
+                item.get(
+                    "tags",
+                    []
+                )
+            ),
+            source="text"
         )
 
-        db.add(new_step)
+        db.add(new_capture)
+        db.commit()
+        db.refresh(new_capture)
 
-    db.commit()
+        # storing capture
+        store_capture(
+        capture_id=new_capture.id,
+        text=item["text"],
+        intent=item["intent"],
+        tags=item["tags"]
+    )
+
+        # Generate roadmap
+
+        steps = generate_action_plan(
+            item["text"]
+        )
+
+        for index, step in enumerate(
+            steps,
+            start=1
+        ):
+
+            new_step = ActionPlan(
+                capture_id=new_capture.id,
+                step_number=index,
+                step_title=step.get(
+                    "title",
+                    f"Step {index}"
+                ),
+                step_description=step.get(
+                    "description",
+                    ""
+                ),
+                status="Pending"
+            )
+
+            db.add(new_step)
+
+
+        saved_captures.append(
+            {
+                "capture_id": new_capture.id,
+                "text": item["text"],
+                "intent": item["intent"],
+                "priority": item["priority"],
+                "steps_created": len(
+                    steps
+                )
+            }
+        )
+
     return {
-        "message": "Capture saved successfully",
-        "capture_id": new_capture.id,
-        "analysis": analysis
+        "message":
+        f"{len(saved_captures)} captures created",
+        "captures":
+        saved_captures
     }
-    

@@ -1,8 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Text, DateTime, JSON, Boolean
 from sqlalchemy.sql import func
 
 from app.database.db import Base
-
 
 class Capture(Base):
 
