@@ -69,16 +69,8 @@ def render_voice_capture():
                 result = response.json()
                 st.write(result)
                 transcription = result["transcription"]
-            # st.write("Transcription:")
+    
                 st.write(transcription)
-
-            # st.write(
-            #     "### Transcription"
-            # )
-
-            # st.write(
-            #     transcription
-            # )
 
             response = requests.post(
             f"{API_URL}/capture",
