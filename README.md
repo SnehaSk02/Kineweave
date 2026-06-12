@@ -118,6 +118,104 @@ What task was related to shopping?
 * ChromaDB
 * Semantic Retrieval
 
+# Running KineWeave
+
+## Prerequisites
+
+Install:
+
+* Python 3.11+
+* MySQL Server
+* Git
+
+---
+
+## Step 1: Clone Repository
+
+```bash
+git clone <repository_url>
+cd KineWeave
+```
+
+---
+
+
+## Step 2: Install Dependencies
+
+Backend:
+
+```bash
+pip install -r requirements.txt
+```
+---
+
+## Step 3: Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+DB_USER=root
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=kineweave
+
+GROQ_API_KEY=your_groq_api_key
+```
+
+---
+
+## Step 4: Start Backend
+
+Navigate to backend folder:
+
+```bash
+cd backend
+```
+
+Run:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend will start on:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger Documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## Step 5: Start Frontend
+
+Open a second terminal.
+
+Navigate to frontend folder:
+
+```bash
+cd frontend
+```
+
+Run:
+
+```bash
+streamlit run app.py
+```
+
+Frontend will start on:
+
+```text
+http://localhost:8501
+```
+
+
 
 ## Future Enhancements
 * Email Notifications

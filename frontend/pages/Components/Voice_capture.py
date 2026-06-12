@@ -44,10 +44,6 @@ def render_voice_capture():
                     audio["bytes"]
                 )
 
-            st.success(
-                "Sending to Whisper..."
-            )
-
             with open(
                 "recording.wav",
                 "rb"
@@ -67,7 +63,6 @@ def render_voice_capture():
                 )
 
                 result = response.json()
-                st.write(result)
                 transcription = result["transcription"]
     
                 st.write(transcription)
