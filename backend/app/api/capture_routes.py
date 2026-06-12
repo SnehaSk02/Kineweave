@@ -70,25 +70,23 @@ def create_capture(
         db.commit()
         db.refresh(new_capture)
 
-        # storing capture
+        # storing capture (vector index)
         store_capture(
         capture_id=new_capture.id,
         text=item["text"],
         intent=item["intent"],
         tags=item["tags"]
-    )
+        )
 
         # Generate roadmap
 
-        steps = generate_action_plan(
-            item["text"]
+        steps = generate_action_plan( 
+            item["text"]          #text send to planner
         )
 
-        for index, step in enumerate(
-            steps,
-            start=1
-        ):
-
+        for index, step in enumerate(steps,start=1):
+            if not isinstance(step, dict):
+                continue
             new_step = ActionPlan(
                 capture_id=new_capture.id,
                 step_number=index,
@@ -104,6 +102,7 @@ def create_capture(
             )
 
             db.add(new_step)
+        db.commit()
 
 
         saved_captures.append(

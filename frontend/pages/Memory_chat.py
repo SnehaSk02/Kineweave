@@ -3,88 +3,102 @@ import requests
 
 API_URL = "http://127.0.0.1:8000"
 
-st.title("🧠 Memory Explorer")
-
-query = st.text_input(
-    "Search your memory"
+st.markdown(
+    "<h2 style='color:white;'>🧠 Ask Memory</h2>",
+    unsafe_allow_html=True
 )
 
-if st.button("Search"):
+st.caption(
+    "Search your past activities using semantic memory."
+)
 
-    response = requests.get(
-        f"{API_URL}/memory-search",
-        params={
-            "query": query
-        }
-    )
+query = st.text_input(
+    "What are you looking for?",
+    placeholder="e.g. interview, groceries, project deadline"
+)
 
-    st.session_state["memory_results"] = (
-        response.json()["results"]
-    )
+if st.button("🔍 Search Memory"):
 
+    if not query:
 
-if "memory_results" in st.session_state:
-
-    results = st.session_state[
-        "memory_results"
-    ]
-
-    if results:
-
-        option_map = {
-            f"[{r['intent']}] {r['text']}":
-            r["capture_id"]
-            for r in results
-        }
-
-        selected = st.selectbox(
-            "Select Memory",
-            list(option_map.keys())
+        st.warning(
+            "Please enter a search query."
         )
 
-        capture_id = option_map[selected]
+    else:
 
-        details = requests.get(
-            f"{API_URL}/memory-details/{capture_id}"
-        ).json()
+        with st.spinner(
+            "Searching memories..."
+        ):
 
-        st.subheader(details["text"])
-
-        st.write(
-            f"Intent: {details['intent']}"
-        )
-
-        st.write(
-            f"Priority: {details['priority']}"
-        )
-
-        st.write(
-            f"Status: {details['status']}"
-        )
-
-        progress = details.get(
-            "progress",
-            0
-        )
-
-        st.progress(progress / 100)
-
-        st.write(
-            f"{progress}% Complete"
-        )
-
-        st.write("### Action Plan")
-
-        for plan in details["plans"]:
-
-            st.write(
-                f"{plan['step_number']}. {plan['title']}"
+            response = requests.get(
+                f"{API_URL}/memory-search",
+                params={
+                    "query": query
+                }
             )
 
-            st.caption(
-                plan["description"]
-            )
+            if response.status_code != 200:
 
-            st.write(
-                f"Status: {plan['status']}"
-            )
+                st.error(
+                    "Unable to search memory."
+                )
+
+            else:
+
+                results = response.json().get(
+                    "results",
+                    []
+                )
+
+                if not results:
+
+                    st.info(
+                        "No matching memories found."
+                    )
+
+                else:
+
+                    st.success(
+                        f"Found {len(results)} related memories"
+                    )
+
+                    for item in results:
+
+                        with st.expander(
+                            item["text"]
+                        ):
+
+                            st.write(
+                                f"**Intent:** {item['intent']}"
+                            )
+
+                            # st.write(
+                            #     f"**Priority:** {item['priority']}"
+                            # )
+
+                            st.write(
+                                f"**Status:** {item['status']}"
+                            )
+
+                            if item.get(
+                                "plans"
+                            ):
+
+                                st.write(
+                                    "### Action Plan"
+                                )
+
+                                for plan in item[
+                                    "plans"
+                                ]:
+
+                                    st.write(
+                                        f"• {plan['step']}"
+                                    )
+
+                                    st.caption(
+                                        f"Status: {plan['status']}"
+                                    )
+
+                            

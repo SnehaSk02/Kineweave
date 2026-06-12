@@ -61,7 +61,7 @@ def generate_plan(capture_id: int, db: Session = Depends(get_db)):
             status="Pending"
         )
 
-    db.add(new_step)
+        db.add(new_step)
 
     db.commit()
 

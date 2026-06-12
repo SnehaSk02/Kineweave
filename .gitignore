@@ -5,3 +5,4 @@ __pycache__/
 .vscode/
 backend/test_intent.py
 frontend/voice_test.py
+frontend/recording.wav

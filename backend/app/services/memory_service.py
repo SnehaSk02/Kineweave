@@ -1,9 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.capture import Capture
-from app.services.vector_store import (
-    search_memory
-)
+from app.services.vector_store import search_memory
 
 
 def find_related_memories(

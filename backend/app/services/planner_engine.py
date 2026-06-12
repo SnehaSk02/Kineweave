@@ -39,7 +39,4 @@ Goal:
 
         print(f"Planner Error: {e}")
 
-        return {
-            "goal": goal,
-            "steps": []
-        } 
+        return []
