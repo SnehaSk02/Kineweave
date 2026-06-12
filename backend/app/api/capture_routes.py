@@ -47,10 +47,8 @@ def create_capture(
                 "Task"
             ),
             status="Pending",
-            priority=item.get(
-                "priority",
-                "Medium"
-            ),
+            priority=request.priority if request.priority else item.get("priority","Medium"),
+            deadline=request.deadline if request.deadline else item.get("deadline",""),
             entities=json.dumps(
                 item.get(
                     "entities",
@@ -72,11 +70,11 @@ def create_capture(
 
         # storing capture (vector index)
         store_capture(
-        capture_id=new_capture.id,
-        text=item["text"],
-        intent=item["intent"],
-        tags=item["tags"]
-        )
+            capture_id=new_capture.id,
+            text=item["text"],
+            intent=item["intent"],
+            tags=item["tags"]
+            )
 
         # Generate roadmap
 
@@ -111,9 +109,9 @@ def create_capture(
                 "text": item["text"],
                 "intent": item["intent"],
                 "priority": item["priority"],
-                "steps_created": len(
-                    steps
-                )
+                "steps_created": len(steps),
+                "deadline": new_capture.deadline,
+
             }
         )
 

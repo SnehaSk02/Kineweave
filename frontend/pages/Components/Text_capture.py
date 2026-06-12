@@ -32,9 +32,9 @@ def render_text_capture():
                 "Task Captured"
             )
 
-            st.json(
-                response.json()
-            )
+            # st.json(
+            #     response.json()
+            # )
 
         else:
 

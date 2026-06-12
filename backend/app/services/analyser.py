@@ -30,8 +30,14 @@ Your job is to:
 3. Extract entities.
 4. Assign priority.
 5. Generate tags.
+6. Identify deadline.
 
 Return ONLY valid JSON.
+
+IMPORTANT RULES FOR SPLITTING:
+- DO NOT split sentences connected by "so", "because", "therefore", "but" or "also" unless they clearly introduce a completely new, unrelated topic.
+- If a sentence starts with a lowercase letter (like "so"), it is likely a continuation of the previous sentence. Merge it with the previous capture.
+- Treat "and" as a separator ONLY if it connects two distinct subjects (e.g., "Buy milk and call mom"), not if it connects details (e.g., "Submit project and prepare for it").
 
 Schema:
 
@@ -41,6 +47,7 @@ Schema:
             "text": "",
             "intent": "",
             "priority": "",
+            "deadline": "",
             "entities": {{
                 "person": [],
                 "date": [],
@@ -112,6 +119,7 @@ Output:
             "entities": {{
                 "person": [],
                 "date": ["tomorrow"],
+                "deadline": "tomorrow",
                 "time": [],
                 "organization": [],
                 "topic": ["groceries"]

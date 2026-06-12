@@ -40,16 +40,20 @@ def render_form_capture():
 
             return
 
+        due_date_str = due_date.strftime("%Y-%m-%d")
+
         text = (
             f"{title}. "
-            f"Due on {due_date}. "
+            f"Due on {due_date_str}. "
             f"Priority is {priority}."
         )
 
         response = requests.post(
             f"{API_URL}/capture",
             json={
-                "text": text
+                "text": title,
+                "deadline":due_date_str,
+                "priority":priority
             }
         )
 
@@ -77,13 +81,12 @@ def render_form_capture():
 
                     st.write(
                         f"Priority: "
-                        f"{capture['priority']}"
+                        f"{priority}"
                     )
 
                     st.write(
-                        f"Steps Created: "
-                        f"{capture['steps_created']}"
-                    )
+                        f"Due_date: "
+                        f"{capture.get('deadline', 'No deadline')}")
 
         else:
 
